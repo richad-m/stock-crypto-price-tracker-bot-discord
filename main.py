@@ -4,12 +4,6 @@ import methods
 
 my_secret = os.environ['TOKEN']
 
-KAARIS_WORDS = ['k2a', 'kaaris', 'K2A', 'or noir']
-KAARIS_RESPONSE = "Si tu cherches l'échec tu demandes à Kaaris"
-RAP_WORDS = ['rap', 'RAP', 'Rap']
-RAP_ANSWER = 'Qui, Toi ? Tu fais du R.A.P. Baltringue ?'
-ALLUME_WORDS = ["J'allume", "j'allume"]
-
 client = discord.Client()
 
 
@@ -30,25 +24,6 @@ async def on_message(message):
         # Greets the author of the message
         autor = message.author.display_name
         await message.channel.send("Yo to you {}. Feel free to ask for help by typing the command !help".format(autor))
-
-    if message.content.endswith('mdr'):
-        await message.channel.send("t'es un petit rigolo toi ^^")
-
-    if message.content.startswith('!booba'):
-        try:
-            response = methods.get_booba_quote()
-        except:
-            response = "I couldn't retrieve any Booba quotes, sorry :("
-        await message.channel.send(response)
-
-    if any(word in message.content for word in ALLUME_WORDS):
-        await message.channel.send("J'allume")
-
-    if any(word in message.content for word in KAARIS_WORDS):
-        await message.channel.send(KAARIS_RESPONSE)
-
-    if any(word in message.content for word in RAP_WORDS):
-        await message.channel.send(RAP_ANSWER)
 
     if message.content.startswith('!price'):
         symbol = message.content.split()[1]
