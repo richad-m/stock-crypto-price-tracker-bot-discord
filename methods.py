@@ -1,6 +1,5 @@
 import requests
 import os
-# Use any db to stock informations about watchlist
 from replit import db
 
 WATCHLISTS = {"stocks": "watchlist",
@@ -13,7 +12,7 @@ def get_booba_quote():
     # Returns a random booba quote
     response = requests.get("https://api.booba.cloud")
     quote = response.json()["quote"]
-    return ("\"{}\"").format(quote)
+    return (">>> \"{}\"").format(quote)
 
 
 def get_growth(today_price, yesterday_price):
@@ -42,7 +41,7 @@ def get_stock_price(tri):
     growth = get_growth(rounded_open_price, rounded_previous_price)
 
     symbol = response.json()["Meta Data"]["2. Symbol"]
-    return "{} stock opened at {}$ ({}) ".format(symbol, rounded_open_price, growth)
+    return "**{}** stock opened at *{}$* ({}) ".format(symbol, rounded_open_price, growth)
 
 
 def add_stock_to_follow(stock, product):
@@ -54,21 +53,21 @@ def add_stock_to_follow(stock, product):
         stocks = db[watchlist]
         stocks.append(stock)
         db[watchlist] = stocks
-        response = "{} has beend added to followed stocks : {}".format(
+        response = ">>> {} has beend added to followed stocks : {}".format(
             stock, ','.join(stocks))
     else:
         # If watchlist already exists
         if stock in db[watchlist]:
             # If asked stock already in watchlist, tell the user
             stocks = db[watchlist]
-            response = "{} is already added to followed stocks : {}".format(
+            response = ">>> {} is already added to followed stocks : {}".format(
                 stock, ", ".join(stocks))
         else:
             # If asked stock not in watchlist, add it and tell the new watchlist
             stocks = db[watchlist]
             stocks.append(stock)
             db[watchlist] = stocks
-            response = "{} has beend added to followed stocks : {}".format(
+            response = ">>> {} has beend added to followed stocks : {}".format(
                 stock, ', '.join(stocks))
     return response
 
@@ -78,7 +77,7 @@ def stock_to_follow(product):
     watchlist = WATCHLISTS[product]
     if watchlist not in db.keys():
         # If there are no watchlist yet, tell the user
-        response = "No stocks followed for now, add stocks with '!stocks AAPL for example'"
+        response = ">>> No stocks followed for now, add stocks with '!stocks AAPL for example'"
     else:
         # If there is a watchlist, display price for all products
         stocks = db[watchlist]
@@ -86,13 +85,19 @@ def stock_to_follow(product):
         for stock in stocks:
             # Getting all prices and growth of the watchlist
             if product == 'stocks':
-                # If stock watchlist, call get_stock_price
-                response_list.append(get_stock_price(stock))
+                try:
+                    # If stock watchlist, call get_stock_price
+                    response_list.append(get_stock_price(stock))
+                except KeyError:
+                    return ">>> Something went wrong retrieving prices...Please retry in a few seconds :clock1:"
             elif product == 'crypto':
-                # If crypto watchlist, call get_crypto_price
-                response_list.append(get_crypto_price(stock))
-        string_stocks = "\n- ".join(response_list)
-        response = "Here are your followed {} :chart_with_upwards_trend: \n\n - {}".format(
+                try:
+                    # If crypto watchlist, call get_crypto_price
+                    response_list.append(get_crypto_price(stock))
+                except KeyError:
+                    return ">>> Something went wrong retrieving prices...Please retry in a few seconds :clock1:"
+        string_stocks = "\n• ".join(response_list)
+        response = ">>> Here are your followed {} :chart_with_upwards_trend: : \n\n• {}".format(
             product, string_stocks)
     return response
 
@@ -102,7 +107,7 @@ def remove_stock_to_follow(stock, product):
     watchlist = WATCHLISTS[product]
     if watchlist not in db.keys():
         # If no watchlist exists, tell the user
-        response = "No {} followed for now, add {} with '!stocks AAPL for example'".format(
+        response = ">>> No {} followed for now, add {} with '!stocks AAPL for example'".format(
             product, product)
     else:
         stocks = db[watchlist]
@@ -111,12 +116,21 @@ def remove_stock_to_follow(stock, product):
             # Try to delete stock from watchlist and confirm to the user
             stocks.remove(stock)
             db[watchlist] = stocks
-            response = "{} has beend deleted to followed {} : {}".format(
-                stock, product, string_stocks)
+            new_string_stocks = ', '.join(stocks)
+            response = ">>> {} has beend deleted from followed {} : {}".format(
+                stock, product, new_string_stocks)
         except ValueError:
             # If stock not in current watchlist, tell the user
-            response = "{} does not seem to be in your watchlist.Here is your current watchlist : {}".format(
+            response = ">>> {} does not seem to be in your watchlist. Here is your current watchlist : {}".format(
                 stock, string_stocks)
+    return response
+
+
+def reset_stock_to_follow(product):
+    # Resets watchlist
+    watchlist = WATCHLISTS[product]
+    db[watchlist] = []
+    response = "Your watchlist has been reset :recycle:"
     return response
 
 
@@ -137,4 +151,4 @@ def get_crypto_price(crypto, fiat='EUR'):
 
     symbol = response.json()["Meta Data"]["3. Digital Currency Name"]
 
-    return "{} stock opened at {}{} ({}) ".format(symbol, rounded_open_price, fiat, growth)
+    return "{} crypto opened at {}{} ({}) ".format(symbol, rounded_open_price, fiat, growth)

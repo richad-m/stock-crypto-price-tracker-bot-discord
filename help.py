@@ -1,0 +1,3 @@
+def message():
+    response = "Here a list of command : \n\n>>>  • **!yo** : says Yo\n • **!booba** : an inspirational Booba quote\n • **!price** : retrieves stock price and growth\n • **!cryptoprice** : retrieves crypto price and growth\n • **!stocks** : displays your stock watchlist\n • **!stocks add** : adds a stock to your watchlist\n • **!stocks delete** : removes a stock from your watchlist\n • **!stocks reset** : resets your stock watchlist\n • **!cryptolist** : displays your cryptowatchlist\n • **!cryptolist reset** : resets your cryptowatchlist\n • **!cryptolist add** : adds a crypto to tour watchlist\n • **!cryptolist delete** : removes a crypto from your watchlist\n"
+    return response
